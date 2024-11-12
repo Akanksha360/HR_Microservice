@@ -69,6 +69,7 @@ export function Service(props) {
       }
       else
       {
+        
         let requestmodel = localStorage.getItem("RequestModel");
         let token =await getAccessTokenSilently();
         console.log(JSON.parse(requestmodel) ,"request query client side")
