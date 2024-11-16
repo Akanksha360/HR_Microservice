@@ -26,13 +26,13 @@ const io = new Server(server, {
 
 
 io.on('connection', (socket) => {
-  console.log("User connected: ", socket.id);
+  //console.log("User connected: ", socket.id);
   socketArray.push(socket)
   
     socket.broadcast.emit("hello")
  
   socket.on('disconnect', () => {
-    console.log("User got disconnected!");
+    //console.log("User got disconnected!");
   })
 
 })
@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
 //Evaluating the Corresponding module_name sent by the get request
 function evaluate_service_routes(service_name, module_name)
 {
-  console.log("i am here",service_name,module_name)
+ // console.log("i am here",service_name,module_name)
     let response=''
     if (service_name.localeCompare("HRService") == 0) {
       switch (module_name) {
@@ -61,12 +61,13 @@ function evaluate_service_routes(service_name, module_name)
 
 ///Get All Request
 app.get("/:service_name/:module_name",authentication.authenticate, authorizartion.authorize, async (req, res) => {
+  //console.log("hey i am here api gateway ",req)
   try {
       let service_name = req.params.service_name;
       let module_name = req.params.module_name;
-      console.log("headers ",req.headers['requestmodelquery'])
+     // console.log("headers ",req.headers['requestmodelquery'])
       let requestModelQuery_temp;
-      if(req.headers['requestmodelquery']!=undefined)
+      if(!!req.headers['requestmodelquery'])
       {
          requestModelQuery_temp=JSON.parse(req.headers['requestmodelquery']);
       }
@@ -78,7 +79,7 @@ app.get("/:service_name/:module_name",authentication.authenticate, authorizartio
      // console.log((requestModelQuery_temp))
       //evaluate url to call via axios
       let url = evaluate_service_routes(service_name, module_name)
-      console.log(url);
+     // console.log(url);
       //axios call
       await axios.get(url,{
         headers:{
@@ -98,12 +99,13 @@ app.get("/:service_name/:module_name",authentication.authenticate, authorizartio
 
 ///Post Request
 app.post("/:service_name/:module_name",authentication.authenticate, authorizartion.authorize, (req, res) => {
+  // console.log("hey i am here api gateway ",req)
     const requestModel=JSON.parse(JSON.stringify(req.headers))['requestmodel'];
-    console.log(JSON.parse(requestModel),"post 400000000 port");
+   console.log(JSON.parse(requestModel),"post 400000000 port");
     const topicName = req.params.module_name + "_ADD";//EMPLOYEE_ADD
     //Publishing (method in Utility.ts)
     const response = utility.PublicMessageToTopic(topicName, JSON.parse(requestModel));
-    console.log(response)
+   // console.log(response)
     res.json(response);
 });
 //{"dataCollection":[{"name":"shahrukh khan","age":50}]}
@@ -133,18 +135,22 @@ app.put("/:service_name/:module_name/:id",authentication.authenticate, authoriza
 app.delete("/:service_name/:module_name/:id",authentication.authenticate, authorizartion.authorize, (req, res) => {
 let topicName = req.params.module_name + "_DELETE"; 
 //Publishing (method in Utility.ts)
-console.log(req.params.id)
+//console.log(req.params.id)
 const response = utility.PublicMessageToTopic(topicName,req.params.id);
 res.json(response);
 });
 
+app.get('/test',(req,res)=>{
+  //console.log("req",req)
+  res.send("akanksha")
+})
 
 ///Server //it is also listening to the Utility(Broker) method listenToServices(which listens all the services to which API-Gateway is subscriber) 
 server.listen(port, () => {
     console.log("Server Runnig on : ", port);
     utility.listenToServices("API_GATEWAY_SERVICE", (result) => {
         const { message } = result;
-        console.log(result);
+        //console.log(result);
     });
 });
 

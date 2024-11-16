@@ -32,7 +32,7 @@ export class Utility {
 
   public async init_utility() {
     try {
-      console.log("Connecting to rabbitmq " + this.rabbitmqURL);
+     // console.log("Connecting to rabbitmq " + this.rabbitmqURL);
       amqp?.connect(this.rabbitmqURL, (err, connection) => {
         if (err) {
           console.log("from connection", err);

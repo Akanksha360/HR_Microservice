@@ -12,7 +12,7 @@ module.exports = class Authentication{
     }
     static async authenticate(req, res, next){
         try{
-                console.log(req.headers);
+                //console.log(req.headers);
                 const token = req.headers.authorization.split(" ")[1];
                // console.log(token)
                 let algo={algorithms:['RS256']};
@@ -25,7 +25,10 @@ module.exports = class Authentication{
                // console.log(allConfig.data.userinfo_endpoint);
                 const finalUserInfo=await axios.get(allConfig.data.userinfo_endpoint,{headers:{authorization: `Bearer ${token}`}})
                // console.log("Final")
-                //console.log(finalUserInfo.data);
+                console.log(finalUserInfo.data);
+                // req.email=finalUserInfo.data.email;
+                //     req.name=finalUserInfo.data.name
+                    next();
             
                 // if(finalUserInfo.data.email.localeCompare('akanksha.ruchi2606@gmail.com')==0&&finalUserInfo.data.name.localeCompare('Akanksha')==0||finalUserInfo.data.email.localeCompare('akanksharuchi26@gmail.com')==0&&finalUserInfo.data.name.localeCompare('Akanksha')==0)
                 // {

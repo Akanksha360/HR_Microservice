@@ -61,7 +61,16 @@ export function Service(props) {
   async function CallPost() {
     console.log("poststststststst")
     try {
-      
+      let token =await getAccessTokenSilently();
+      await axios.get(`http://localhost:4000/test`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+          requestmodelquery: ""
+        }
+      }).then((res) => {
+        console.log("hey",res)
+      })
+
       if(localStorage.getItem("RequestModel")==null)
       {
         setdata("Please Provide RequestModel")
