@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import io from 'socket.io-client';
 import './App.css'
 import { useAuth0 } from '@auth0/auth0-react'
-const socket = io.connect('http://localhost:4000');
+//const socket = io.connect('http://localhost:4000');
 
 const Container = styled.div`
   display: flex;                
