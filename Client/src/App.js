@@ -77,6 +77,7 @@ export default function App() {
   const { loginWithPopup, logout, isAuthenticated, } = useAuth0();
   return (
     <>
+    
       {isAuthenticated ?
         <div>
           <Navbar logout={logout} />
