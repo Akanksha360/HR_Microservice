@@ -1,8 +1,6 @@
 class Filter {
     constructor() {
-        
         this.conditions = []; 
-
     }
 };
 

@@ -14,7 +14,7 @@ export class Utility {
   private static instance: Utility;//Prototype
   private queueURLMap: { [id: string]: QueueURLMapValue } = {};
   private channel;
-  private rabbitmqURL: string = `amqp://localhost`;
+  private rabbitmqURL: string = `amqp://guest:guest@localhost`;
   private topicNames: string[] = [];
 
   private constructor() {
@@ -32,17 +32,16 @@ export class Utility {
 
   public async init_utility() {
     try {
-     // console.log("Connecting to rabbitmq " + this.rabbitmqURL);
-      amqp?.connect(this.rabbitmqURL, (err, connection) => {
+     amqp.connect(this.rabbitmqURL, (err, connection) => {
+      if (err) {
+        return; // STOP here
+      }
+    
+      connection.createChannel((err, channel) => {
         if (err) {
-          console.log("from connection", err);
+          return; // STOP here
         }
-        connection?.createChannel((err, channel) => {
-          if (err) {
-            console.log("from connection", err);
-          }
-          this.channel = channel;
-          
+       this.channel = channel;
           //Reading All the Topics
           const topics = Exchange.Topics;
           for (let i = 0; i < topics.length; i++) {
@@ -77,7 +76,7 @@ export class Utility {
         });
       });
     } catch (error) {
-      console.log(error.message);
+      console.log("gjhsgdgs",error.message);
     }
   }
   public PublicMessageToTopic(topicName: string,message: any): ResponseModel {

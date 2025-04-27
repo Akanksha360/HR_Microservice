@@ -60,8 +60,8 @@ var Utility = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 try {
-                    console.log("Connecting to rabbitmq " + this.rabbitmqURL);
-                    amqp.connect(this.rabbitmqURL, function (err, connection) {
+                    console.log("Connecting toooooooooo rabbitmq " +"amqp://guest:guest@localhost:5672");
+                    amqp.connect("amqp://guest:guest@localhost:5672", function (err, connection) {
                         if (err) {
                             console.log("from connection", err);
                         }
