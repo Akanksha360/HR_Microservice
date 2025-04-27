@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
-const socket = io.connect('http://localhost:4000');
+const socket = io.connect('http://localhost:8001');
 
 function Socket() {
   // const [isConnected, setIsConnected] = useState(socket.connected);

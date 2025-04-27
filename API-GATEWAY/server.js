@@ -4,7 +4,7 @@ const { Utility } =require ("./rmq/utility");
 var utility = Utility.getInstance();
 var cors = require("cors");
 const axios  =require("axios").default;
-const port = 4000;
+const port = 8001;
 app.use(express.json())
 app.use(cors());
 const RequestModel =require('../API-GATEWAY/Models/RequestModel')
@@ -59,13 +59,16 @@ function evaluate_service_routes(service_name, module_name)
     return response;
 }
 
+app.get('/test',(req,res)=>{
+  //console.log("req",req)
+  res.send("akanksha")
+})
+
 ///Get All Request
 app.get("/:service_name/:module_name",authentication.authenticate, authorizartion.authorize, async (req, res) => {
-  //console.log("hey i am here api gateway ",req)
   try {
       let service_name = req.params.service_name;
       let module_name = req.params.module_name;
-     // console.log("headers ",req.headers['requestmodelquery'])
       let requestModelQuery_temp;
       if(!!req.headers['requestmodelquery'])
       {
@@ -74,13 +77,7 @@ app.get("/:service_name/:module_name",authentication.authenticate, authorizartio
       else{
         requestModelQuery_temp=new RequestQueryModel();
       }
-     // console.log(JSON.parse(requestModelQuery_temp))
-     // console.log(JSON.stringify(requestModelQuery_temp))
-     // console.log((requestModelQuery_temp))
-      //evaluate url to call via axios
       let url = evaluate_service_routes(service_name, module_name)
-     // console.log(url);
-      //axios call
       await axios.get(url,{
         headers:{
           requestmodelquery:JSON.stringify(requestModelQuery_temp)
@@ -98,22 +95,24 @@ app.get("/:service_name/:module_name",authentication.authenticate, authorizartio
 
 
 ///Post Request
+//{"dataCollection":[{"name":"shahrukh khan","age":50}]}
 app.post("/:service_name/:module_name",authentication.authenticate, authorizartion.authorize, (req, res) => {
-  // console.log("hey i am here api gateway ",req)
     const requestModel=JSON.parse(JSON.stringify(req.headers))['requestmodel'];
    console.log(JSON.parse(requestModel),"post 400000000 port");
     const topicName = req.params.module_name + "_ADD";//EMPLOYEE_ADD
-    //Publishing (method in Utility.ts)
     const response = utility.PublicMessageToTopic(topicName, JSON.parse(requestModel));
-   // console.log(response)
     res.json(response);
 });
-//{"dataCollection":[{"name":"shahrukh khan","age":50}]}
 
 
 //Put Request
+//{"dataCollection":[{"name":"shahrukh khan","age":50}]}
+//{"dataCollection":[{"department_name":"History"}]}
+//{"dataCollection":[{"department_id":8,"employee_id":59}]}
+//RequestQueryModel
+//{"filter": {"conditions": [{"field_name": "id","field_value": 6,"operator": "="}]},"pageInfo": {"offset": 2,"limit": 5}}
+//{"filter": {"conditions": [{"field_name": "id","field_value": 50,"operator_type": "=","condition_operator":"and"},{"field_name": "name","field_value":"Akshara","operator_type": "=","condition_operator":"and"}]},"pageInfo": {"offset": 2,"limit": 5}}
 app.put("/:service_name/:module_name/:id",authentication.authenticate, authorizartion.authorize, (req, res) => {
-    
     const requestModel=JSON.parse(JSON.stringify(req.headers))['requestmodel'];
     const topicName = req.params.module_name + "_UPDATE"; 
     const body = {
@@ -124,12 +123,7 @@ app.put("/:service_name/:module_name/:id",authentication.authenticate, authoriza
     const response = utility.PublicMessageToTopic(topicName, body);
     res.json(response);
 });
-//{"dataCollection":[{"name":"shahrukh khan","age":50}]}
-//{"dataCollection":[{"department_name":"History"}]}
-//{"dataCollection":[{"department_id":8,"employee_id":59}]}
-//RequestQueryModel
-//{"filter": {"conditions": [{"field_name": "id","field_value": 6,"operator": "="}]},"pageInfo": {"offset": 2,"limit": 5}}
-//{"filter": {"conditions": [{"field_name": "id","field_value": 50,"operator_type": "=","condition_operator":"and"},{"field_name": "name","field_value":"Akshara","operator_type": "=","condition_operator":"and"}]},"pageInfo": {"offset": 2,"limit": 5}}
+
 
 //Delete Request
 app.delete("/:service_name/:module_name/:id",authentication.authenticate, authorizartion.authorize, (req, res) => {
@@ -140,17 +134,15 @@ const response = utility.PublicMessageToTopic(topicName,req.params.id);
 res.json(response);
 });
 
-app.get('/test',(req,res)=>{
-  //console.log("req",req)
-  res.send("akanksha")
-})
 
-///Server //it is also listening to the Utility(Broker) method listenToServices(which listens all the services to which API-Gateway is subscriber) 
+
+///Server //it is also listening to the Utility(Broker) 
+//method listenToServices(which listens all the services to which API-Gateway is subscriber) 
 server.listen(port, () => {
     console.log("Server Runnig on : ", port);
     utility.listenToServices("API_GATEWAY_SERVICE", (result) => {
         const { message } = result;
-        //console.log(result);
+        console.log(result);
     });
 });
 

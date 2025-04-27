@@ -11,10 +11,7 @@ export class EmployeeDto extends DtoBase{
 
    
     public age:number;
-
-    
     public name:string;
-
     public employee_departments:Array<EmployeeDepartmentDto>;
 
 

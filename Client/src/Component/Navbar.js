@@ -1,42 +1,48 @@
-import { Service } from "../Component/Service"
-import { BrowserRoutes, Route } from 'react'
-import { useState } from 'react'
-import Home from './Home'
+import { useState } from 'react';
+import Home from './Home';
+import { Service } from '../Component/Service';
 
-let menu = {
-  color: "white",
-  float: "left",
-  paddding: "5px",
-  border: "none",
-}
+const menuItems = [
+  { label: 'Home', value: 'HOME' },
+  { label: 'EMPLOYEE', value: 'EMPLOYEE' },
+  { label: 'DEPARTMENT', value: 'DEPARTMENT' },
+  { label: 'EMPLOYEEDEPARTMENT', value: 'EMPLOYEEDEPARTMENT' },
+];
 
+export default function Navbar({ logout }) {
+  const [activeMenu, setActiveMenu] = useState('HOME');
 
+  const renderContent = () => {
+    return activeMenu === 'HOME' ? <Home /> : <Service service={activeMenu} />;
+  };
 
-
-export default function Navbar(props) {
-  let [service, setService] = useState();
-  let [home, setHome] = useState(true)
   return (
-
-    <div className="pos-f-t">
-      <div className="collapse" id="navbarToggleExternalContent">
-        <div className="bg-dark p-4">
-          <h4 className="text-white">HRSERVICE</h4>
-          <span className="text-muted"></span>
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-gradient-to-r from-sky-600 to-sky-800 p-4 flex flex-wrap items-center justify-between shadow-md">
+        <div className="text-white text-2xl font-semibold tracking-wide">HRSERVICE</div>
+        <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+          {menuItems.map((item) => (
+            <button
+              key={item.value}
+              onClick={() => setActiveMenu(item.value)}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                activeMenu === item.value
+                  ? 'bg-white text-sky-700 shadow'
+                  : 'bg-sky-500 text-white hover:bg-sky-400'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+          <button
+            onClick={logout}
+            className="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition-all duration-200"
+          >
+            Logout
+          </button>
         </div>
-      </div>
-      <nav className="navbar navbar-dark bg-dark">
-        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <button className="rounded-lg bg-lightblue text-white" onClick={() => setHome(true)}>Home</button>
-        <button className="rounded-lg bg-lightblue text-white" onClick={() => { setService("EMPLOYEE"); setHome(false) }}>EMPLOYEE</button>
-        <button className="rounded-lg bg-lightblue text-white" onClick={() => { setService("DEPARTMENT"); setHome(false) }}>DEPARTMENT</button>
-        <button className="rounded-lg bg-lightblue text-white" onClick={() => { setService("EMPLOYEEDEPARTMENT"); setHome(false) }}>EMPLOYEEDEPARTMENT</button>
-        <button className="rounded-lg bg-lightblue text-white" onClick={props.logout}>Logout</button>
       </nav>
-      {home ? <Home /> : <Service service={service} />}
+      <div className="p-4">{renderContent()}</div>
     </div>
-
-  )
+  );
 }
