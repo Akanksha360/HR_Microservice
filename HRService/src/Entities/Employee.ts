@@ -6,15 +6,11 @@ import { EntityBase } from "./EntityBase";
 
 @Entity("employees")
 export default class Employee extends EntityBase{
-   
-
     constructor(){
         super();
         this.name='';
         this.age=0;
-        
     }
-
     @Column({ name:'age' })
     age:number;
 

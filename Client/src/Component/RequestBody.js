@@ -1,8 +1,4 @@
-// import { useContext } from 'react';
 import { useState } from 'react';
-
-import { TextareaAutosize, Typography } from '@mui/material';
-
 // import { DataContext } from '../context/DataProvider';
 
 const textareaStyle = {
@@ -16,30 +12,10 @@ const textareaStyle = {
     borderColor: '#ccc'
 }
 
-const RequestBody = () => {
-
-    const [RequestModel, setRequestModel] = useState();
-    const [RequestModelQuery, setRequestModelQuery] = useState();
+const RequestBody = ({
+    setRequestModel,setRequestModelQuery
+}) => {
     const [id, setID]=useState();
-    const onValueChange1 = (e) => {
-        setRequestModel(e.target.value);
-        
-       
-    }
-    if(RequestModel!=undefined)
-    localStorage.setItem("RequestModel", JSON.stringify(RequestModel));
-    const onValueChange2 = (e) => {
-        setRequestModelQuery(e.target.value);
-       
-       
-    }
-    if(RequestModelQuery!=undefined)
-    localStorage.setItem("RequestModelQuery", JSON.stringify(RequestModelQuery));
-
-    if(id!=null)
-    localStorage.setItem("id",id)
-    
-   
     return (
         <>
             <br />
@@ -49,15 +25,16 @@ const RequestBody = () => {
                 minRows={2}
                 maxRows={4}
                 style={textareaStyle}
-                onChange={(e) => onValueChange2(e)}
+                onChange={(e) => setRequestModelQuery(e.target.value)}
             />
-            <Typography mt={2} mb={2}>Request Model</Typography>
+            
+            <div>Request Model</div>
             <textarea
              className='border'
                 minRows={2}
                 maxRows={4}
                 style={textareaStyle}
-                onChange={(e) => onValueChange1(e)}
+                onChange={(e) =>setRequestModel(e.target.value)}
             />
             Provide the id for update and delete here....
             ID : <input type="number" placeholder='id' onChange={(e)=>setID(e.target.value)}/>

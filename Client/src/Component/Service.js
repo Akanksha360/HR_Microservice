@@ -7,6 +7,8 @@ export function Service({ service }) {
   const { getAccessTokenSilently } = useAuth0();
   const [responseData, setResponseData] = useState("No response yet.");
   const apiBase = "http://localhost:8001/HRService";
+  const [RequestModel, setRequestModel] = useState();
+  const [RequestModelQuery, setRequestModelQuery] = useState();
 
   const showMessage = (message) => {
     setResponseData(typeof message === "string" ? message : JSON.stringify(message, null, 2));
@@ -16,8 +18,10 @@ export function Service({ service }) {
 
   const handleGet = async () => {
     try {
+
       const token = await fetchToken();
-      const requestModelQuery = JSON.parse(localStorage.getItem("RequestModelQuery") || "null");
+      const requestModelQuery = JSON.parse(RequestModelQuery || "null"
+      );
 
       const res = await axios.get(`${apiBase}/${service}`, {
         headers: {
@@ -27,7 +31,6 @@ export function Service({ service }) {
       });
 
       showMessage(res.data?.dataCollection || "No data received.");
-      localStorage.removeItem("RequestModelQuery");
     } catch (error) {
       console.error(error);
       showMessage("Error during GET.");
@@ -35,9 +38,8 @@ export function Service({ service }) {
   };
 
   const handlePost = async () => {
-    const requestModel = localStorage.getItem("RequestModel");
+    const requestModel = RequestModel;
     if (!requestModel) return showMessage("Please provide RequestModel.");
-
     try {
       const token = await fetchToken();
       const res = await axios.post(`${apiBase}/${service}`, {}, {
@@ -48,7 +50,6 @@ export function Service({ service }) {
       });
 
       showMessage(res.data?.message);
-      localStorage.removeItem("RequestModel");
     } catch (error) {
       console.error(error);
       showMessage("Error during POST.");
@@ -57,7 +58,7 @@ export function Service({ service }) {
 
   const handlePut = async () => {
     const id = localStorage.getItem("id");
-    const requestModel = localStorage.getItem("RequestModel");
+    const requestModel = RequestModel;
     if (!id || !requestModel) return showMessage("Please provide RequestModel and ID.");
 
     try {
@@ -70,8 +71,7 @@ export function Service({ service }) {
       });
 
       showMessage(res.data?.message);
-      localStorage.removeItem("RequestModel");
-      localStorage.removeItem("id");
+      
     } catch (error) {
       console.error(error);
       showMessage("Error during PUT.");
@@ -120,7 +120,7 @@ export function Service({ service }) {
         ))}
       </div>
 
-      <RequestBody />
+      <RequestBody setRequestModelQuery={setRequestModelQuery} setRequestModel={setRequestModel}/>
 
       <div className="mt-6">
         <h3 className="text-xl font-semibold mb-2 text-gray-800">Response</h3>
