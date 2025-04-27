@@ -15,13 +15,9 @@ export default class EmployeeAppService extends ApplicationService<Employee, Emp
     constructor(employeeRepository: EmployeeRepository) {
         super(employeeRepository);
     }
-
-
-
     public exployee_data_processing_function() {
 
     }
-
     CreateEntityInstance(): Employee {
         let emp = new Employee();
         emp.id = 34;

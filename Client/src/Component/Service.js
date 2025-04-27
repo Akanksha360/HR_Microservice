@@ -1,226 +1,136 @@
-import RequestBody from "./RequestBody"
-import axios from "axios"
-import { useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
-import { Typography, Box, TextareaAutosize } from "@mui/material"
-import { useEffect} from "react";
+import axios from "axios";
+import { useState } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+import RequestBody from "./RequestBody";
 
-const textareaStyle = {
-    width: '100%',
-    padding: 10,
-    background: `url(http://i.imgur.com/2cOaJ.png)`,
-    backgroundAttachment: 'local',
-    backgroundRepeat: 'no-repeat',
-    paddingLeft: 35,
-    paddingTop: 10,
-    borderColor: '#ccc'
-}
+export function Service({ service }) {
+  const { getAccessTokenSilently } = useAuth0();
+  const [responseData, setResponseData] = useState("No response yet.");
+  const apiBase = "http://localhost:8001/HRService";
 
-const btnstyle = {
-  backgroundColor: "lightgreen",
-  width: "100px",
-  height: "40px",
-  border: "none",
-  fontSize: "22px",
-  marginLeft: "120px"
-}
+  const showMessage = (message) => {
+    setResponseData(typeof message === "string" ? message : JSON.stringify(message, null, 2));
+  };
 
+  const fetchToken = async () => await getAccessTokenSilently();
 
+  const handleGet = async () => {
+    try {
+      const token = await fetchToken();
+      const requestModelQuery = JSON.parse(localStorage.getItem("RequestModelQuery") || "null");
 
-export function Service(props) {
-  let { getAccessTokenSilently } = useAuth0();
-  let [data, setdata] = useState("");
-  let [request, setRequest] = useState("YOUR RESPONSE");
-
-  async function CallGet() {
-    try 
-    {
-        let requestmodelquery = localStorage.getItem("RequestModelQuery")==null?null:JSON.parse(localStorage.getItem("RequestModelQuery"))
-        console.log("requestmodelquery ",requestmodelquery)
-        let token = await getAccessTokenSilently();
-        await axios.get(`http://localhost:4000/HRService/${props.service}`, {
+      const res = await axios.get(`${apiBase}/${service}`, {
         headers: {
           authorization: `Bearer ${token}`,
-          requestmodelquery: requestmodelquery
-        }
-      }).then((res) => {
-        console.log(res.data)
-        localStorage.setItem("GetItem", JSON.stringify(res.data.dataCollection));
-        localStorage.removeItem("RequestModelQuery")
-        setdata(localStorage.getItem("GetItem"))
-        localStorage.removeItem("GetItem")
-      })
+          requestmodelquery: requestModelQuery,
+        },
+      });
+
+      showMessage(res.data?.dataCollection || "No data received.");
+      localStorage.removeItem("RequestModelQuery");
+    } catch (error) {
+      console.error(error);
+      showMessage("Error during GET.");
     }
-    catch (error) {
-      console.log(error)
-    }
-  }
+  };
 
+  const handlePost = async () => {
+    const requestModel = localStorage.getItem("RequestModel");
+    if (!requestModel) return showMessage("Please provide RequestModel.");
 
-
-  async function CallPost() {
-    console.log("poststststststst")
     try {
-      let token =await getAccessTokenSilently();
-      await axios.get(`http://localhost:4000/test`, {
+      const token = await fetchToken();
+      const res = await axios.post(`${apiBase}/${service}`, {}, {
         headers: {
+          requestmodel: JSON.parse(requestModel),
           authorization: `Bearer ${token}`,
-          requestmodelquery: ""
-        }
-      }).then((res) => {
-        console.log("hey",res)
-      })
+        },
+      });
 
-      if(localStorage.getItem("RequestModel")==null)
-      {
-        setdata("Please Provide RequestModel")
-        throw ("Eoror")
-      }
-      else
-      {
-        
-        let requestmodel = localStorage.getItem("RequestModel");
-        let token =await getAccessTokenSilently();
-        console.log(JSON.parse(requestmodel) ,"request query client side")
-        await axios.post(`http://localhost:4000/HRService/${props.service}`, {}, {
-        headers: {
-          requestmodel: (JSON.parse(requestmodel)),
-          authorization: `Bearer ${token}`
-        }
-        }).then((res) => {
-          console.log("res ",res)
-          localStorage.setItem("PostItem", JSON.stringify(res.data.message))
-          localStorage.removeItem("RequestModel")
-          setdata(localStorage.getItem("PostItem"))
-          localStorage.removeItem("PostItem")
-        })
-      }
-
+      showMessage(res.data?.message);
+      localStorage.removeItem("RequestModel");
+    } catch (error) {
+      console.error(error);
+      showMessage("Error during POST.");
     }
-    catch (error) {
-      console.log(error)
-    }
-  }
+  };
 
+  const handlePut = async () => {
+    const id = localStorage.getItem("id");
+    const requestModel = localStorage.getItem("RequestModel");
+    if (!id || !requestModel) return showMessage("Please provide RequestModel and ID.");
 
-  async function CallPut() {
-   
     try {
-      if(localStorage.getItem("RequestModel")==null||localStorage.getItem("id")==null)
-      {
-        setdata("Please provide RequestModel and Id");
-      }
-      else
-      {
-        let requestmodel = (localStorage.getItem("RequestModel"))
-        let id=localStorage.getItem("id");
-        let token = await getAccessTokenSilently()
-        await axios.put(`http://localhost:4000/HRService/${props.service}/${id}`, {}, {
+      const token = await fetchToken();
+      const res = await axios.put(`${apiBase}/${service}/${id}`, {}, {
         headers: {
-          requestmodel: (JSON.parse(requestmodel)),
-          authorization: `Bearer ${token}`
-        }
-        }).then((res) => {
-        console.log(res)
-        localStorage.setItem("PutItem", JSON.stringify(res.data.message))
-        localStorage.removeItem("RequestModel")
-        setdata(localStorage.getItem("PutItem"))
-        localStorage.removeItem("PutItem")
-       })
-      }
-    }
-    catch (error) {
-      console.log(error)
-    }
-  }
+          requestmodel: JSON.parse(requestModel),
+          authorization: `Bearer ${token}`,
+        },
+      });
 
+      showMessage(res.data?.message);
+      localStorage.removeItem("RequestModel");
+      localStorage.removeItem("id");
+    } catch (error) {
+      console.error(error);
+      showMessage("Error during PUT.");
+    }
+  };
 
-  async function CallDelete() {
+  const handleDelete = async () => {
+    const id = localStorage.getItem("id");
+    if (!id) return showMessage("Please provide ID.");
+
     try {
-      let id=localStorage.getItem("id");
-      if(id==null)
-      {
-        setdata("Please Provide the ID");
-      }
-      else
-      {
-        id=parseInt(id)
-        console.log(id)
-        let token = await getAccessTokenSilently();
-        await axios.delete(`http://localhost:4000/HRService/${props.service}/${id}`, {
-        headers: {
-          authorization: `Bearer ${token}`
-        }
-        }).then((res) => {
-        console.log("response ",res)
-        localStorage.setItem("DeleteItem", JSON.stringify(res.data.message))
-        setdata(localStorage.getItem("DeleteItem"))
-        localStorage.removeItem("DeleteItem")
-        localStorage.removeItem("id")
-        })
-      }
-    }
-    catch (error) {
-      console.log(error)
-    }
-  }
+      const token = await fetchToken();
+      const res = await axios.delete(`${apiBase}/${service}/${parseInt(id)}`, {
+        headers: { authorization: `Bearer ${token}` },
+      });
 
-
-
-/*
-  useEffect(() => {
-    if (request.localeCompare("Get") == 0) {
-        setRequest("YOUR Response")
-        setdata(((localStorage.getItem("GetItem"))))
-        console.log(data)
-        localStorage.removeItem("GetItem")
+      showMessage(res.data?.message);
+      localStorage.removeItem("id");
+    } catch (error) {
+      console.error(error);
+      showMessage("Error during DELETE.");
     }
-    if (request.localeCompare("Post") == 0) {
-        setRequest("YOUR Response")
-        setdata(((localStorage.getItem("PostItem"))))
-        console.log(data)
-        localStorage.removeItem("PostItem")
-    }
-    if (request.localeCompare("Put") == 0) {
-        setRequest("YOUR Response")
-        setdata(((localStorage.getItem("PutItem"))))
-        console.log(data)
-        localStorage.removeItem("PutItem")
-    }
-    if (request.localeCompare("Delete") == 0) {
-        setRequest("YOUR Response")
-        setdata(((localStorage.getItem("DeleteItem"))))
-        console.log(data)
-        localStorage.removeItem("DeleteItem")
-    }
-},[request])
-*/
+  };
 
-
+  // 🎯 Data-driven UI for buttons
+  const actions = [
+    { label: "GET", onClick: handleGet },
+    { label: "POST", onClick: handlePost },
+    { label: "PUT", onClick: handlePut },
+    { label: "DELETE", onClick: handleDelete },
+  ];
 
   return (
-    <div className="w-[80%] m-auto bg-white-500">
-      <br />
-      <h1 style={{ marginLeft: "600px" }}>{props.service}</h1>
-      <div className="gap-4 flex ">
-      <button className="rounded-lg py-2 px-4 bg-lightblue-500 text-white" onClick={() => { CallGet(); }}>Get </button>
-      <button className="rounded-lg p-2 bg-lightblue-500 text-white" onClick={() => { CallPost(); }}>Post</button>
-      <button className="rounded-lg p-2 bg-lightblue-500 text-white" onClick={() => { CallPut(); }}>Put </button>
-      <button className="rounded-lg p-2 bg-lightblue-500 text-white" onClick={() => { CallDelete(); }}>Delete </button>
+    <div className="max-w-4xl mx-auto my-8 p-6 bg-white rounded-xl shadow-md">
+      <h2 className="text-3xl font-bold text-center text-sky-700 mb-6">{service}</h2>
+
+      <div className="flex flex-wrap gap-4 justify-center mb-6">
+        {actions.map(({ label, onClick }) => (
+          <button
+            key={label}
+            onClick={onClick}
+            className="px-5 py-2 bg-sky-600 text-white rounded-lg font-medium hover:bg-sky-700 transition"
+          >
+            {label}
+          </button>
+        ))}
       </div>
-     
+
       <RequestBody />
-      <Box>
-            <Typography mt={2} mb={2}>Response</Typography>
-            <TextareaAutosize
-                className="border "
-                minRows={3}
-                maxRows={5}
-                style={textareaStyle}
-                disabled="disabled"
-                value={data}
-            />
-        </Box>
+
+      <div className="mt-6">
+        <h3 className="text-xl font-semibold mb-2 text-gray-800">Response</h3>
+        <textarea
+          readOnly
+          rows={6}
+          value={responseData}
+          className="w-full border border-gray-300 p-3 rounded-lg font-mono text-sm bg-gray-50 resize-none"
+        />
+      </div>
     </div>
-  )
+  );
 }

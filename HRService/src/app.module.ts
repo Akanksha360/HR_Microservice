@@ -11,7 +11,6 @@ import EmployeeDepartment from './Entities/EmployeeDepartment';
 import { DepartmentModule } from './AppModules/Department.module';
 import { EmployeeDepartmentModule } from './AppModules/EmployeeDepartment.module';
 import office from './Entities/office';
-import emp from './Entities/emp'
 @Module({
   imports: [
     EmployeesModule,DepartmentModule,EmployeeDepartmentModule,
@@ -19,10 +18,10 @@ import emp from './Entities/emp'
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'microservice12345',
-      password: 'qwerty12345',
+      username: 'akanksha',
+      password: 'akanksha@123',
       database: 'microservice_database',
-      entities: [Employee, Department, EmployeeDepartment,emp,office],
+      entities: [Employee, Department, EmployeeDepartment,office],
       synchronize: true,
       logging:true
     })
