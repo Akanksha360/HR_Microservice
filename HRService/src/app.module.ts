@@ -10,7 +10,6 @@ import Department from './Entities/Department';
 import EmployeeDepartment from './Entities/EmployeeDepartment';
 import { DepartmentModule } from './AppModules/Department.module';
 import { EmployeeDepartmentModule } from './AppModules/EmployeeDepartment.module';
-import office from './Entities/office';
 @Module({
   imports: [
     EmployeesModule,DepartmentModule,EmployeeDepartmentModule,
@@ -21,7 +20,7 @@ import office from './Entities/office';
       username: 'akanksha',
       password: 'akanksha@123',
       database: 'microservice_database',
-      entities: [Employee, Department, EmployeeDepartment,office],
+      entities: [Employee, Department, EmployeeDepartment],
       synchronize: true,
       logging:true
     })
